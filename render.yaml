@@ -2,14 +2,15 @@ services:
   # Backend FastAPI
   - type: web
     name: citas-medicas-backend
-    env: python
+    runtime: python
     region: ohio
     plan: free
-    buildCommand: "cd backend && pip install -r requirements.txt"
-    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
-        sync: false # Debes llenar esto en el Dashboard de Render manualmente
+        sync: false 
       - key: SECRET_KEY
         generateValue: true
       - key: ALGORITHM
@@ -20,12 +21,15 @@ services:
   # Frontend Next.js
   - type: web
     name: citas-medicas-frontend
-    env: node
+    runtime: node
     region: ohio
     plan: free
-    buildCommand: "cd frontend && npm install && npm run build"
-    startCommand: "cd frontend && npm run start"
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm run start"
     envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
       - key: NEXT_PUBLIC_API_URL
         fromService:
           type: web
