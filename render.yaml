@@ -4,6 +4,7 @@ services:
     name: citas-medicas-backend
     env: python
     region: ohio
+    plan: free
     buildCommand: "cd backend && pip install -r requirements.txt"
     startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
@@ -21,6 +22,7 @@ services:
     name: citas-medicas-frontend
     env: node
     region: ohio
+    plan: free
     buildCommand: "cd frontend && npm install && npm run build"
     startCommand: "cd frontend && npm run start"
     envVars:
