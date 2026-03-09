@@ -16,6 +16,8 @@ app = FastAPI(title="Citas Médicas API", version="1.0.0")
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
     "https://citas-medicas-app.onrender.com",
 ]
 
@@ -28,9 +30,9 @@ app.add_middleware(
 )
 
 # 3. ROUTERS DEL BACKEND (Deben ir antes del catch-all del frontend)
-app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(medicos.router, prefix="/medicos", tags=["medicos"])
-app.include_router(citas.router, prefix="/citas", tags=["citas"])
+app.include_router(auth.router)
+app.include_router(medicos.router)
+app.include_router(citas.router)
 
 @app.get("/api/health")
 def read_root():
