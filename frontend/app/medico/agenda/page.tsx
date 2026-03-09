@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ClipboardList, Calendar } from 'lucide-react';
 import api from '@/lib/api';
-import { CitaResponse } from '@/types';
+import { CitaResponse, EstadoCita } from '@/types';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -21,6 +21,7 @@ export default function MisCitasMedicoPage() {
 
     useEffect(() => {
         fetchCitas();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchCitas = async () => {
@@ -28,7 +29,7 @@ export default function MisCitasMedicoPage() {
             const res = await api.get('/citas/mis-citas');
             setCitas(res.data);
             applyFilter('all', res.data);
-        } catch (error) {
+        } catch {
             toast.error("Error al cargar historial de citas");
         } finally {
             setLoading(false);
@@ -57,11 +58,12 @@ export default function MisCitasMedicoPage() {
             await api.patch(`/citas/${id}/estado`, { estado });
             toast.success("Estado actualizado exitosamente");
             // Update local states
-            const updateList = (list: CitaResponse[]) => list.map(c => c.id === id ? { ...c, estado: estado as any } : c);
+            const updateList = (list: CitaResponse[]) => list.map(c => c.id === id ? { ...c, estado: estado as EstadoCita } : c);
             setCitas(updateList);
             setFilteredCitas(updateList);
-        } catch (err: any) {
-            toast.error(err.response?.data?.detail || "Error actualizando cita");
+        } catch (err) {
+            const axiosError = err as import("axios").AxiosError<{ detail: string }>;
+            toast.error(axiosError.response?.data?.detail || "Error actualizando cita");
         }
     };
 
@@ -88,7 +90,7 @@ export default function MisCitasMedicoPage() {
                     </div>
 
                     <div className="w-[200px] bg-white rounded-md shadow-sm border">
-                        <Select value={filterDate} onValueChange={applyFilter}>
+                        <Select value={filterDate} onValueChange={val => val && applyFilter(val)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Filtrar por fecha" />
                             </SelectTrigger>
@@ -141,7 +143,7 @@ export default function MisCitasMedicoPage() {
                                             <TableCell className="text-right flex justify-end">
                                                 <Select
                                                     value={cita.estado}
-                                                    onValueChange={(val) => updateEstado(cita.id, val)}
+                                                    onValueChange={(val) => val && updateEstado(cita.id, val)}
                                                     disabled={cita.estado === 'completada'}
                                                 >
                                                     <SelectTrigger className="w-[140px]">

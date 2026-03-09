@@ -24,7 +24,7 @@ export default function MisCitasPacientePage() {
         try {
             const res = await api.get('/citas/mis-citas');
             setCitas(res.data);
-        } catch (error) {
+        } catch {
             toast.error("Error al cargar historial de citas");
         } finally {
             setLoading(false);

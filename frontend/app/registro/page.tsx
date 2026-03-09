@@ -121,8 +121,9 @@ export default function RegistroPage() {
             await api.post('/auth/registro', dataPayload);
             toast.success('Registro exitoso. Por favor inicia sesión.');
             router.push('/login');
-        } catch (error: any) {
-            const msg = error.response?.data?.detail || 'Error al registrarse';
+        } catch (err) {
+            const axiosError = err as import("axios").AxiosError<{ detail: string }>;
+            const msg = axiosError.response?.data?.detail || 'Error al registrarse';
             toast.error(typeof msg === 'string' ? msg : JSON.stringify(msg));
         } finally {
             setIsLoading(false);

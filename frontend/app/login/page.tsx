@@ -67,7 +67,8 @@ export default function LoginPage() {
             } else {
                 router.push('/paciente');
             }
-        } catch (error: any) {
+        } catch (err) {
+            const error = err as import("axios").AxiosError<{ detail: string }>;
             const msg = error.response?.data?.detail || 'Error al iniciar sesión';
             toast.error(msg);
         } finally {

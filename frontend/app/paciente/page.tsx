@@ -44,7 +44,7 @@ export default function PacienteDashboard() {
                     futuras.sort((a, b) => new Date(`${a.fecha}T${a.hora_inicio}`).getTime() - new Date(`${b.fecha}T${b.hora_inicio}`).getTime());
                     setProximaCita(futuras[0]);
                 }
-            } catch (error) {
+            } catch {
                 toast.error("Error al cargar la información");
             } finally {
                 setLoading(false);

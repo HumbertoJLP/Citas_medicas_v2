@@ -31,7 +31,7 @@ export default function Home() {
       } else {
         router.push('/paciente');
       }
-    } catch (error) {
+    } catch {
       localStorage.removeItem('token');
       router.push('/login');
     }

@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Search, MapPin, BadgeInfo } from 'lucide-react';
 import api from '@/lib/api';
 import { MedicoResponse, EspecialidadResponse, HorarioResponse } from '@/types';
@@ -15,7 +15,8 @@ import { toast } from 'sonner';
 export default function BuscarMedicoPage() {
     const [especialidades, setEspecialidades] = useState<EspecialidadResponse[]>([]);
     const [medicos, setMedicos] = useState<MedicoResponse[]>([]);
-    const [selectedEspecialidad, setSelectedEspecialidad] = useState<string>('all');
+    // No guardamos selectedEspecialidad porque no se usa en este componente
+    // const [selectedEspecialidad, setSelectedEspecialidad] = useState<string>('all');
 
     // Dialog state
     const [selectedMedico, setSelectedMedico] = useState<MedicoResponse | null>(null);
@@ -40,13 +41,12 @@ export default function BuscarMedicoPage() {
             const url = esp && esp !== 'all' ? `/medicos?especialidad=${esp}` : '/medicos';
             const res = await api.get(url);
             setMedicos(res.data);
-        } catch (error) {
+        } catch {
             toast.error("Error buscando médicos");
         }
     };
 
     const handleEspecialidadChange = (val: string) => {
-        setSelectedEspecialidad(val);
         fetchMedicos(val);
     };
 
@@ -60,7 +60,7 @@ export default function BuscarMedicoPage() {
             const res = await api.get(`/medicos/${medico.persona_id}/horarios`);
             setHorarios(res.data);
             setOpenDialog(true);
-        } catch (err) {
+        } catch {
             toast.error("Error cargando horarios del médico");
         }
     };
@@ -106,8 +106,9 @@ export default function BuscarMedicoPage() {
             });
             toast.success("Cita agendada exitosamente");
             setOpenDialog(false);
-        } catch (error: any) {
-            toast.error(error.response?.data?.detail || "Error al agendar cita");
+        } catch (err) {
+            const axiosError = err as import("axios").AxiosError<{ detail: string }>;
+            toast.error(axiosError.response?.data?.detail || "Error al agendar cita");
         } finally {
             setLoadingCita(false);
         }
@@ -131,7 +132,7 @@ export default function BuscarMedicoPage() {
                 <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center bg-white p-4 rounded-xl shadow-sm border">
                     <Search className="h-5 w-5 text-muted-foreground ml-2 hidden sm:block" />
                     <div className="w-full sm:w-1/3">
-                        <Select onValueChange={handleEspecialidadChange} defaultValue="all">
+                        <Select onValueChange={(val) => val && handleEspecialidadChange(val)} defaultValue="all">
                             <SelectTrigger>
                                 <SelectValue placeholder="Filtrar por Especialidad" />
                             </SelectTrigger>

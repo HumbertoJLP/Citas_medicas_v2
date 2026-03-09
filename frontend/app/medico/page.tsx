@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Stethoscope, CheckCircle, Clock } from 'lucide-react';
 import api from '@/lib/api';
-import { CitaResponse } from '@/types';
+import { CitaResponse, EstadoCita } from '@/types';
 import { format, parseISO, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -36,7 +36,7 @@ export default function MedicoDashboard() {
                 hoyList.sort((a, b) => new Date(`1970-01-01T${a.hora_inicio}`).getTime() - new Date(`1970-01-01T${b.hora_inicio}`).getTime());
 
                 setCitasHoy(hoyList);
-            } catch (error) {
+            } catch {
                 toast.error("Error al cargar la agenda del día");
             } finally {
                 setLoading(false);
@@ -50,9 +50,10 @@ export default function MedicoDashboard() {
         try {
             await api.patch(`/citas/${id}/estado`, { estado });
             toast.success("Estado actualizado exitosamente");
-            setCitasHoy(prev => prev.map(c => c.id === id ? { ...c, estado: estado as any } : c));
-        } catch (err: any) {
-            toast.error(err.response?.data?.detail || "Error actualizando cita");
+            setCitasHoy(prev => prev.map(c => c.id === id ? { ...c, estado: estado as EstadoCita } : c));
+        } catch (err) {
+            const axiosError = err as import("axios").AxiosError<{ detail: string }>;
+            toast.error(axiosError.response?.data?.detail || "Error actualizando cita");
         }
     };
 
@@ -104,7 +105,7 @@ export default function MedicoDashboard() {
                                             <div className="w-full sm:w-auto flex flex-col items-end gap-2">
                                                 <Select
                                                     defaultValue={cita.estado}
-                                                    onValueChange={(val) => updateEstado(cita.id, val)}
+                                                    onValueChange={(val) => val && updateEstado(cita.id, val)}
                                                     disabled={cita.estado === 'completada'}
                                                 >
                                                     <SelectTrigger className="w-[160px] bg-white">
