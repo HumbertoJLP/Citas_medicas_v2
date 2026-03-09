@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+// Si es producción (Render), el backend y frontend están en el mismo servidor (Monolito), relativo a "/"
+// Si es desarrollo local ("npm run dev"), apunta a localhost:8001
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8001');
 
 const api = axios.create({
   baseURL: API_URL,

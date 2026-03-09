@@ -1,13 +1,10 @@
 services:
-  # Monolito (Backend FastAPI + Frontend Next.js Estático)
+  # Monolito (Backend FastAPI + Frontend React Unificado)
   - type: web
     name: citas-medicas-app
-    runtime: python
+    env: docker
     region: ohio
     plan: free
-    # Usaremos rootDir en la raíz para poder construir el frontend y luego correr el backend
-    buildCommand: "cd frontend && npm install && npm run build && cd ../backend && pip install -r requirements.txt && rm -rf static && mv ../frontend/out static"
-    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
         sync: false 
